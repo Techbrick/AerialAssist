@@ -9,4 +9,9 @@
 
 class DriveSubsystem : public RobotDrive {
 
+public:
+	DriveSubsystem (UINT32 frontLeftMotorChannel, UINT32 rearLeftMotorChannel, UINT32 frontRightMotorChannel, UINT32 rearRightMotorChannel, float sensitivity = 0.5) : RobotDrive(UINT32 frontLeftMotorChannel, UINT32 rearLeftMotorChannel, UINT32 frontRightMotorChannel, UINT32 rearRightMotorChannel, float sensitivity = 0.5)
+	{
+
+	}
 };
