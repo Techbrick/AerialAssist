@@ -50,7 +50,8 @@ public:
 
 void Shooter::prime()
 {
-	//pn1=in, pn2=in, winch=off; state: fired
+	//pn1=in, pn2=in, winch=off
+	//state: fired
 	if (pneumatic1_0.Get() && pneumatic2_0.Get() && !winch.Get())
 	{
 		pneumatic1_0.Set(false);
@@ -62,9 +63,13 @@ void Shooter::prime()
 		winchDigEncoder.Reset();
 		winchDigEncoder.Start();
 
+		//while the winch has spun less than 10 revs. This is temporary.
+		//TODO: replace this with something useful.
 		while ( (winchDigEncoder.Get()/255.0)*360.0) < 360.0*10.0 )
 		{   }
 
 		winch.Set(Relay.kOff);
+		pneumatic2_0.Set(true);
+		pneumatic2_1.Set(false);
 	}
 }
