@@ -7,15 +7,15 @@
 class Shooter {
 	Relay winch;
 	Encoder winchDigEncoder;
-	Solenoid pneumatic1_0;  // For engaging the motor with the winch spool.
-	Solenoid pneumatic1_1;  // 1_0 is false (0) when the pneumatic is out,
+	Solenoid motorPn1_0;  // For engaging the motor with the winch spool.
+	Solenoid motorPn1_1;  // 1_0 is false (0) when the pneumatic is out,
 							// 1_1 is true (1) when the pneumatic is out.
 							// In other words, the solenoid 1_x.Get() is
 							// true when the state of the pneumatic is x
 							// (0 = in, 1 = out).
 
-	Solenoid pneumatic2_0;  // For engaging the ratchet.
-	Solenoid pneumatic2_1;  // Similar naming scheme.
+	Solenoid RatchPn2_0;  // For engaging the ratchet.
+	Solenoid RatchPn2_1;  // Similar naming scheme.
 	
 	Talon arm;
 	DigitalInput armBackLimitSwitch;
@@ -28,10 +28,10 @@ public:
 	Shooter () :
 		winch				(SHOOTER_WINCH_SPIKE),
 		winchDigEncoder		(SHOOTER_WINCH_DE_A, SHOOTER_WINCH_DE_B),
-		pneumatic1_0		(SHOOTER_WINCH_PNEUM1_0),
-		pneumatic1_1		(SHOOTER_WINCH_PNEUM1_1),
-		pneumatic2_0		(SHOOTER_WINCH_PNEUM2_0),
-		pneumatic2_1		(SHOOTER_WINCH_PNEUM2_1),
+		motorPn1_0		(SHOOTER_WINCH_MOTORPNEUM1_0),
+		motorPn1_1		(SHOOTER_WINCH_MOTORPNEUM1_1),
+		RatchPn2_0		(SHOOTER_WINCH_RATCHPNEUM2_0),
+		RatchPn2_1		(SHOOTER_WINCH_RATCHPNEUM2_1),
 		arm					(SHOOTER_ARM_TALON),
 		armBackLimitSwitch	(SHOOTER_ARM_LIMSWIT_BACK),
 		armFrontLimitSwitch	(SHOOTER_ARM_LIMSWIT_FRONT),
@@ -52,12 +52,13 @@ void Shooter::prime()
 {
 	//pn1=in, pn2=in, winch=off
 	//state: fired
-	if (pneumatic1_0.Get() && pneumatic2_0.Get() && !winch.Get())
+	if (motorPn1_0.Get() && RatchPn2_0.Get() && !winch.Get())
 	{
-		pneumatic1_0.Set(false);
-		pneumatic1_1.Set(true);
-		pneumatic2_0.Set(false);
-		pneumatic2_1.Set(true);
+		RatchPn2_0.Set(false);
+		RatchPn2_1.Set(true);
+		motorPn1_0.Set(false);
+		motorPn1_1.Set(true);
+
 
 		winch.Set(Relay.kOn);
 		winchDigEncoder.Reset();
@@ -69,7 +70,7 @@ void Shooter::prime()
 		{   }
 
 		winch.Set(Relay.kOff);
-		pneumatic2_0.Set(true);
-		pneumatic2_1.Set(false);
+		motorPn1_0.Set(true);
+		motorPn1_1.Set(false);
 	}
 }
