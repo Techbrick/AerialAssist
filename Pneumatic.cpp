@@ -1,3 +1,6 @@
+#ifndef TECHBRICK_PNEUMATICS_CPP_
+#define TECHBRICK_PNEUMATICS_CPP_
+
 #include "WPILib.h"
 
 class Pneumatic {
@@ -31,3 +34,5 @@ bool Pneumatic::Get ()
 {
 	return OutSole.Get();
 }
+
+#endif
