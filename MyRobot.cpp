@@ -15,12 +15,14 @@ class RobotDemo : public SimpleRobot
         DriveSubsystem myRobot;
         Joystick leftStick;
         Joystick rightStick;
+        Compressor comp;
 
 public:
 	RobotDemo(void):
 		myRobot(FRONTLEFT_JAG, BACKLEFT_JAG, FRONTRIGHT_JAG, BACKRIGHT_JAG),
                 leftStick(1),
-                rightStick(2)
+                rightStick(2),
+                compressor(PRESSURESWITCH_PIN, COMPRELAY_PIN)
 	{
 		myRobot.SetExpiration(0.1);
 	}
@@ -29,24 +31,28 @@ public:
 	///////////////////////////////////////////////////////////////
 	void Autonomous(void)
 	{
+                compressor.Start()
 		myRobot.SetSafetyEnabled(false);
+                compressor.Stop()
 	}
 
 	
 	///////////////////////////////////////////////////////////////
 	void OperatorControl(void)
 	{
+                compressor.Start()
 		myRobot.SetSafetyEnabled(true);
 		while (IsOperatorControl())
 		{
                         myRobot.TankDrive(leftStick, rightStick);
 			Wait(0.005);								// wait for a motor update time
 		}
+                compressor.Stop()
 	}
 	
 	///////////////////////////////////////////////////////////////
 	void Test() {
-		
+
 	}
 };
 
