@@ -1,7 +1,7 @@
 #include "WPILib.h"
 
 #include "PinDefinitions.h"
-#include "Pneumatic.h"
+#include "Pneumatic.cpp"
 #include "DriveSubsystem.cpp"
 
 /**
