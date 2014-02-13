@@ -1,25 +1,15 @@
 #include "WPILib.h"
 #include "PinDefinitions.h"
+#include "Pneumatic.cpp"
 #include <tgmath.h>
-// Computer specific path for Numeri: ..\..\Techbrick\MainWorkingCode\WPILib\
-// WPILib\WPILib.h
-
-
-//TODO: makesure that Potentiometer.cpp class is used!!
 
 class Shooter {
 	Relay winch;
 	Encoder winchDigEncoder;
-	Solenoid motorPn1_0;  // For engaging the motor with the winch spool.
-	Solenoid motorPn1_1;  // 1_0 is false (0) when the pneumatic is out,
-							// 1_1 is true (1) when the pneumatic is out.
-							// In other words, the solenoid 1_x.Get() is
-							// true when the state of the pneumatic is x
-							// (0 = in, 1 = out).
 
-	Solenoid ratchPn2_0;  // For engaging the ratchet.
-	Solenoid ratchPn2_1;  // Similar naming scheme.
-	
+	Pneumatic motorPn;
+	Pneumatic ratchPn;
+
 	Talon arm;
 	DigitalInput armBackLimitSwitch;
 	DigitalInput armFrontLimitSwitch;
@@ -31,17 +21,19 @@ class Shooter {
 
 public:
 	Shooter () :
-		winch				(SHOOTER_WINCH_SPIKE),
-		winchDigEncoder		(SHOOTER_WINCH_DE_A, SHOOTER_WINCH_DE_B),
-		motorPn1_0		(SHOOTER_WINCH_MOTORPNEUM1_0),
-		motorPn1_1		(SHOOTER_WINCH_MOTORPNEUM1_1),
-		ratchPn2_0		(SHOOTER_WINCH_RATCHPNEUM2_0),
-		ratchPn2_1		(SHOOTER_WINCH_RATCHPNEUM2_1),
-		arm					(SHOOTER_ARM_TALON),
-		armBackLimitSwitch	(SHOOTER_ARM_LIMSWIT_BACK),
-		armFrontLimitSwitch	(SHOOTER_ARM_LIMSWIT_FRONT),
-		armPotent			(SHOOTER_ARM_POT),
-		primeTask			("Prime", (FUNCPTR) Robot::primeTaskFunc);
+		winch (SHOOTER_WINCH_SPIKE),
+		winchDigEncoder (SHOOTER_WINCHDIGITALENCA, SHOOTER_WINCHDIGITALENCB),
+		motorPn (SHOOTER_WINCHMOTORSOLIN, SHOOTER_WINCHMOTORSOLOUT),
+		ratchPn (SHOOTER_WINCHRATCHSOLIN, SHOOTER_WINCHRATCHSOLOUT),
+		arm (SHOOTER_ARMTALON),
+		armBackLimitSwitch (SHOOTER_ARMLIMITSWITCHBACK),
+		armFrontLimitSwitch (SHOOTER_ARMLIMITSWITCHFRONT),
+		armPotent (SHOOTER_ARMPOT),
+		primeTask ("Prime", (FUNCPTR) Robot::primeTaskFunc)
+	{
+		winchDigEncoder.Start();
+		winchDigEncoder.Reset();
+	}
 
 	float getAngle();
 	float setAngle(float);
@@ -64,17 +56,14 @@ void Shooter::primeTaskFunc()
 {
 	//pn1=in, pn2=in, winch=off
 	//state: fired
-	if (motorPn1_0.Get() && ratchPn2_0.Get() && !winch.Get())
+	if (!motorPn.Get() && !ratchPn.Get() && !winch.Get())
 	{
-		ratchPn2_0.Set(false);
-		ratchPn2_1.Set(true);
-		motorPn1_0.Set(false);
-		motorPn1_1.Set(true);
+		ratchPn.Set(true);	// This order is important
+		motorPn.Set(true);
 
 
 		winch.Set(Relay.kOn);
 		winchDigEncoder.Reset();
-		winchDigEncoder.Start();
 
 		//while the winch has spun less than 10 revs. This is temporary.
 		//TODO: replace this with something useful.
@@ -87,11 +76,11 @@ void Shooter::primeTaskFunc()
 	}
 	else
 	{
-		//pn1=in, pn2=out, winch=off
+		//motorPn=in, ratchPn=out, winch=off
 		//state: ready
-		if (motorPn1_0.Get() && ratchPn2_1.Get() && !winch.Get())
+		if (!motorPn.Get() && ratchPn.Get() && !winch.Get())
 		{
-			//Do NOTHING.
+			//Do nothing.
 		}
 		else
 		{
@@ -113,13 +102,18 @@ void Shooter::fire()
 		SmartDashboard::PutString("Errors", "Shooter::fire(): Shooter::prime() still running");
 	else
 	{
-		if (motorPn1_0.Get() && ratchPN1_1.Get() && !winch.Get())
+		//motorPn=in, ratchPn=out, winch=off
+		//state: ready
+		if (!motorPn.Get() && ratchPn.Get() && !winch.Get())
 		{
-			ratchPN1_1.Set(false);
-			ratchPN1_0.Set(true);
+			ratchPn.Set(false);	// fire.
+			Wait(0.1);
+			winchDigEncoder.Reset();
 		}
 		else
 		{
+			//other
+			///state: probably very broken.
 			SmartDashboard::PutString("Errors", "Shooter::fire(): Unexpected state, potential danger!");
 		}
 	}
@@ -153,4 +147,9 @@ void Shooter::calibrate()
 
 	arm.Set(0.0);
 	armPotent.CalibrateEnd();
+}
+
+float getWinchDistance()
+{
+	return winchDigEncoder.Get(); //TODO: convert this to actual distance!
 }
