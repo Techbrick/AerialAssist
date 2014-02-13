@@ -1,19 +1,37 @@
 #include "WPILib.h"
-// Specific path for Numeri: ..\..\Techbrick\MainWorkingCode\
-// WPILib\WPILib\WPILib.h
+#include "Pneumatic.cpp"
 
 /* This is a simple wrapper for RobotDrive.
- * If needed, we could add more functions to it.
- * (Possibly a Talon current threshold function to prevent
- * burning them out)
+ * Includes TankDrive w/ Super Shifters
  */
+
+//TODO: Possibly a Talon current check to prevent burnouts.
 
 class DriveSubsystem : public RobotDrive {
 
-public:
-	DriveSubsystem (UINT32 frontLeft, UINT32 rearLeft, UINT32 frontRight,
-		UINT32 rearRight) : RobotDrive(frontLeft, rearLeft, frontRight, rearRight)
-	{
+	Pneumatic LeftSuper;	//Left Super Shifter
+	Pneumatic RightSuper;	//Right - -
 
+public:
+	DriveSubsystem ( ) :
+		RobotDrive (DRIVE_FRONTLEFT, DRIVE_REARLEFT, DRIVE_FRONTRIGHT, DRIVE_REARRIGHT),
+		LeftSuper (DRIVE_LEFTSHIFTSOL1, DRIVE_LEFTSHIFTSOL2),
+		RightSuper (DRIVE_RIGHTSHIFTSOL1, DRIVE_RIGHTSHIFTSOL2)
+	{    }
+
+	void TankDrive(GenericHID &leftStick, GenericHID &rightStick)
+	{
+		TankDrive(leftStick.GetY(), rightStick.GetY());
+
+		if (leftStick.GetButton(1))
+		{
+			LeftSuper.Set(true);	//Push out both shifters 
+			RightSuper.Set(true);
+		}
+		else
+		{
+			LeftSuper.Set(false);	//Pull in both shifters 
+			RightSuper.Set(false);
+		}
 	}
 };
