@@ -8,12 +8,12 @@
 
 //TODO: Possibly a Talon current check to prevent burnouts.
 
-class DriveSubsystem : public RobotDrive {
 
+
+class DriveSubsystem : public RobotDrive {
 	Pneumatic LeftSuper;	//Left Super Shifter
 	Pneumatic RightSuper;	//Right - -
 	
-
 public:
 	DriveSubsystem ( ) :
 		RobotDrive (DRIVE_FRONTLEFT, DRIVE_REARLEFT, DRIVE_FRONTRIGHT, DRIVE_REARRIGHT),
