@@ -20,10 +20,10 @@ class RobotDemo : public SimpleRobot
 
 public:
 	RobotDemo(void):
-		myRobot(FRONTLEFT_JAG, BACKLEFT_JAG, FRONTRIGHT_JAG, BACKRIGHT_JAG),
+		myRobot(),
                 leftStick(1),
                 rightStick(2),
-                compressor(PRESSURESWITCH_PIN, COMPRELAY_PIN)
+                compressor()
 	{
 		myRobot.SetExpiration(0.1);
 	}
