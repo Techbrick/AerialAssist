@@ -11,12 +11,13 @@ class DriveSubsystem : public RobotDrive {
 
 	Pneumatic LeftSuper;	//Left Super Shifter
 	Pneumatic RightSuper;	//Right - -
+	
 
 public:
 	DriveSubsystem ( ) :
 		RobotDrive (DRIVE_FRONTLEFT, DRIVE_REARLEFT, DRIVE_FRONTRIGHT, DRIVE_REARRIGHT),
-		LeftSuper (DRIVE_LEFTSHIFTSOL1, DRIVE_LEFTSHIFTSOL2),
-		RightSuper (DRIVE_RIGHTSHIFTSOL1, DRIVE_RIGHTSHIFTSOL2)
+		LeftSuper (DRIVE_LEFTSHIFTSOLIN, DRIVE_LEFTSHIFTSOLOUT),
+		RightSuper (DRIVE_RIGHTSHIFTSOLIN, DRIVE_RIGHTSHIFTSOLOUT)
 	{    }
 
 	void TankDrive(GenericHID &leftStick, GenericHID &rightStick)
