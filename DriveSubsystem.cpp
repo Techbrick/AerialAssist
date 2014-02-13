@@ -1,5 +1,6 @@
 #include "WPILib.h"
 #include "Pneumatic.cpp"
+#include "PinDefinitions.h"
 
 /* This is a simple wrapper for RobotDrive.
  * Includes TankDrive w/ Super Shifters
@@ -20,11 +21,11 @@ public:
 		RightSuper (DRIVE_RIGHTSHIFTSOLIN, DRIVE_RIGHTSHIFTSOLOUT)
 	{    }
 
-	void TankDrive(GenericHID &leftStick, GenericHID &rightStick)
+	void TankDrive(Joystick leftStick, Joystick rightStick)
 	{
-		TankDrive(leftStick.GetY(), rightStick.GetY());
+		RobotDrive::TankDrive(leftStick, rightStick);
 
-		if (leftStick.GetButton(1))
+		if (leftStick.GetRawButton(1))
 		{
 			LeftSuper.Set(true);	//Push out both shifters 
 			RightSuper.Set(true);
