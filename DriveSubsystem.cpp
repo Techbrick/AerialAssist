@@ -13,8 +13,10 @@ class DriveSubsystem : public RobotDrive {
 	Pneumatic RightSuper;	//Right - -
 
 public:
-	DriveSubsystem (UINT32 frontLeft, UINT32 rearLeft, UINT32 frontRight,
-		UINT32 rearRight) : RobotDrive(frontLeft, rearLeft, frontRight, rearRight)
+	DriveSubsystem ( )
+		: RobotDrive (DRIVE_FRNTLEFT, DRIVE_REARLEFT, DRIVE_FRNTRIGHT, DRIVE_REARRIGHT),
+		LeftSuper (DRIVE_LEFT_SUPERSHFTR_PNE),
+		RightSuper (DRIVE_RIGHT_SUPERSHFTR_PNE)
 	{    }
 
 	void TankDrive(GenericHID &leftStick, GenericHID &rightStick)
