@@ -15,8 +15,8 @@ class DriveSubsystem : public RobotDrive {
 public:
 	DriveSubsystem ( ) :
 		RobotDrive (DRIVE_FRONTLEFT, DRIVE_REARLEFT, DRIVE_FRONTRIGHT, DRIVE_REARRIGHT),
-		LeftSuper (DRIVE_LEFTSHFTSOL1, DRIVE_LEFTSHFTSOL2),
-		RightSuper (DRIVE_RIGHTSHFTSOL1, DRIVE_RIGHTSHFTSOL2)
+		LeftSuper (DRIVE_LEFTSHIFTSOL1, DRIVE_LEFTSHIFTSOL2),
+		RightSuper (DRIVE_RIGHTSHIFTSOL1, DRIVE_RIGHTSHIFTSOL2)
 	{    }
 
 	void TankDrive(GenericHID &leftStick, GenericHID &rightStick)
