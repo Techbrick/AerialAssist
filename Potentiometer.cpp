@@ -3,33 +3,29 @@
 class Potentiometer {
 
 public:
-	AnalogChannel potent;
+	AnalogChannel pot;
 	float start, end;	//TODO: check if start and end sound like starting
-						// and ending a process. (Esp. in function names.)
+	// and ending a process. (Esp. in function names.)
 
-	Potentiometer (UINT32 channel) : potent (channel), start (0), end (5)
+	Potentiometer (UINT32 channel) : pot (channel), start (0), end (5)
 	{    }
 
 	Potentiometer (UINT32 channel, float startV, float endV) :
-		potent (channel), start (startV), end (endV)
+		pot (channel), start (startV), end (endV)
 	{    }
 
-	float Get();
-	void CalibrateStart();
-	void CalibrateEnd();
+	float Get()
+	{
+		return (pot.GetAverageVoltage() - start)/(end - start);
+	}
+
+	void CalibrateStart()
+	{
+		start = pot.GetAverageVoltage();
+	}
+
+	void CalibrateEnd()
+	{
+		end = pot.GetAverageVoltage();
+	}
 };
-
-float Potentiometer::Get()
-{
-	return (potent.GetAverageVoltage() - start)/(end - start);
-}
-
-void Potentiometer::CalibrateStart()
-{
-	start = potent.GetAverageVoltage();
-}
-
-void Potentiometer::CalibrateEnd()
-{
-	end = potent.GetAverageVoltage();
-}

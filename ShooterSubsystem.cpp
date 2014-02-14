@@ -1,19 +1,21 @@
 #include "WPILib.h"
 #include "PinDefinitions.h"
 #include "Pneumatic.cpp"
-#include <tgmath.h>
+#include "Potentiometer.cpp"
+
+#define FABS(a) (a<0 ? -a : a)
 
 class Shooter {
 	Relay winch;
 	Encoder winchDigEncoder;
 
-	Pneumatic motorPn;
-	Pneumatic ratchPn;
+	Pneumatic motorLockPiston;	// Engages motor
+	Pneumatic ratchetPiston;	// Engages ratchet
 
 	Talon arm;
 	DigitalInput armBackLimitSwitch;
 	DigitalInput armFrontLimitSwitch;
-	Potentiometer armPotent;
+	Potentiometer armPot;
 
 	Task primeTask;
 
@@ -23,43 +25,97 @@ public:
 	Shooter () :
 		winch (SHOOTER_WINCH_SPIKE),
 		winchDigEncoder (SHOOTER_WINCHDIGITALENCA, SHOOTER_WINCHDIGITALENCB),
-		motorPn (SHOOTER_WINCHMOTORSOLIN, SHOOTER_WINCHMOTORSOLOUT),
-		ratchPn (SHOOTER_WINCHRATCHSOLIN, SHOOTER_WINCHRATCHSOLOUT),
+		motorLockPiston (SHOOTER_WINCHMOTORSOLIN, SHOOTER_WINCHMOTORSOLOUT),
+		ratchetPiston (SHOOTER_WINCHRATCHSOLIN, SHOOTER_WINCHRATCHSOLOUT),
 		arm (SHOOTER_ARMTALON),
 		armBackLimitSwitch (SHOOTER_ARMLIMITSWITCHBACK),
 		armFrontLimitSwitch (SHOOTER_ARMLIMITSWITCHFRONT),
-		armPotent (SHOOTER_ARMPOT),
+		armPot (SHOOTER_ARMPOT),
 		primeTask ("Prime", (FUNCPTR) Robot::primeTaskFunc)
 	{
 		winchDigEncoder.Start();
 		winchDigEncoder.Reset();
 	}
 
-	float getAngle();
-	float setAngle(float);
-	float getWinchDistance();
-	void calibrate();
+	void prime()
+	{
+		primeTask.Start();
+	}
 
-	void prime();
+	bool cancel()
+	{
+		primeTask.Stop();
+	}
 
-	bool cancel();
+	void fire()
+	{
+		if (primeTask.GetID())
+			SmartDashboard::PutString("Errors", "Shooter::fire(): Shooter::prime() still running");
+		else
+		{
+			//motorLockPiston=in, ratchetPiston=out, winch=off
+			//state: ready
+			if (!motorLockPiston.Get() && ratchetPiston.Get() && !winch.Get())
+			{
+				ratchetPiston.Set(false);	// fire.
+				Wait(0.1);
+				winchDigEncoder.Reset();
+			}
+			else
+			{
+				//other
+				///state: probably very broken.
+				SmartDashboard::PutString("Errors", "Shooter::fire(): Unexpected state, potential danger!");
+			}
+		}
+	}
 
-	void fire();
+	float getAngle()
+	{
+		return armPot.Get()*160.0 + 20.0;
+	}
+
+	float setAngle(float angle)
+	{
+		while ( FABS((armPot.Get()*160.0 + 20.0) - angle) > 0.5)
+		{    }
+	}
+
+	void calibrate()
+	{
+		arm.Set(0.8);	//TODO: make sure this is the right direction!
+
+		while (!armFrontLimitSwitch.Get())
+		{    }
+
+		arm.Set(0.0);
+		armPot.CalibrateStart();
+
+		arm.Set(-0.8);	//TODO: make sure this is the right direction!
+
+		while (!armBackLimitSwitch.Get())
+		{    }
+
+		arm.Set(0.0);
+		armPot.CalibrateEnd();
+	}
+
+	float getWinchDistance()
+	{
+		return winchDigEncoder.Get(); //TODO: convert this to actual distance!
+	}
 };
 
-void Shooter::prime()
-{
-	primeTask.Start();
-}
 
-void Shooter::primeTaskFunc()
+
+void primeTaskFunc()
 {
 	//pn1=in, pn2=in, winch=off
 	//state: fired
-	if (!motorPn.Get() && !ratchPn.Get() && !winch.Get())
+	if (!motorLockPiston.Get() && !ratchetPiston.Get() && !winch.Get())
 	{
-		ratchPn.Set(true);	// This order is important
-		motorPn.Set(true);
+		ratchetPiston.Set(true);	// This order is important
+		motorLockPiston.Set(true);
 
 
 		winch.Set(Relay.kOn);
@@ -71,14 +127,13 @@ void Shooter::primeTaskFunc()
 		{   }
 
 		winch.Set(Relay.kOff);
-		motorPn1_0.Set(true);
-		motorPn1_1.Set(false);
+		motorLockPiston.Set(false);
 	}
 	else
 	{
-		//motorPn=in, ratchPn=out, winch=off
+		//motorLockPiston=in, ratchetPiston=out, winch=off
 		//state: ready
-		if (!motorPn.Get() && ratchPn.Get() && !winch.Get())
+		if (!motorLockPiston.Get() && ratchetPiston.Get() && !winch.Get())
 		{
 			//Do nothing.
 		}
@@ -89,67 +144,4 @@ void Shooter::primeTaskFunc()
 			SmartDashboard::PutString("Errors","Shooter::prime(): Shooter in unexpected state");
 		}
 	}
-}
-
-bool Shooter::cancel()
-{
-	primeTask.Stop();
-}
-
-void Shooter::fire()
-{
-	if (primeTask.GetID())
-		SmartDashboard::PutString("Errors", "Shooter::fire(): Shooter::prime() still running");
-	else
-	{
-		//motorPn=in, ratchPn=out, winch=off
-		//state: ready
-		if (!motorPn.Get() && ratchPn.Get() && !winch.Get())
-		{
-			ratchPn.Set(false);	// fire.
-			Wait(0.1);
-			winchDigEncoder.Reset();
-		}
-		else
-		{
-			//other
-			///state: probably very broken.
-			SmartDashboard::PutString("Errors", "Shooter::fire(): Unexpected state, potential danger!");
-		}
-	}
-}
-
-float Shooter::getAngle()
-{
-	return armPotent.Get()*160.0 + 20.0;
-}
-
-float Shooter::setAngle(float angle)
-{
-	while ( fabs((armPotent.Get()*160.0 + 20.0) - angle) > 0.5)
-	{    }
-}
-
-void Shooter::calibrate()
-{
-	arm.Set(0.8);	//TODO: make sure this is the right direction!
-
-	while (!armFrontLimitSwitch.Get())
-	{    }
-
-	arm.Set(0.0);
-	armPotent.CalibrateStart();
-
-	arm.Set(-0.8);	//TODO: make sure this is the right direction!
-
-	while (!armBackLimitSwitch.Get())
-	{    }
-
-	arm.Set(0.0);
-	armPotent.CalibrateEnd();
-}
-
-float getWinchDistance()
-{
-	return winchDigEncoder.Get(); //TODO: convert this to actual distance!
 }
