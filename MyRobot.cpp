@@ -3,6 +3,7 @@
 #include "PinDefinitions.h"
 #include "Pneumatic.cpp"
 #include "DriveSubsystem.cpp"
+#include "NetworkListener.cpp"
 
 /**
  * MyRobot.cpp
@@ -16,7 +17,8 @@ class RobotDemo : public SimpleRobot
         DriveSubsystem myRobot;
         Joystick leftStick;
         Joystick rightStick;
-        Compressor comp;
+        Compressor compressor;
+        NetworkListener l;
 
 public:
 	RobotDemo(void):
