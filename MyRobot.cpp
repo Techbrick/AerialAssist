@@ -4,6 +4,7 @@
 #include "Pneumatic.cpp"
 #include "DriveSubsystem.cpp"
 #include "NetworkListener.cpp"
+#include "ShooterSubsystem.cpp"
 
 /**
  * MyRobot.cpp
