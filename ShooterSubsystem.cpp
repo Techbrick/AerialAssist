@@ -3,7 +3,10 @@
 #include "Pneumatic.cpp"
 #include "Potentiometer.cpp"
 
-#define FABS(a) (a<0 ? -a : a)
+float fabs (float a)
+{
+	return (a<0 ? -a : a);	
+}
 
 class Shooter {
 	Relay winch;
@@ -77,7 +80,7 @@ public:
 
 	float setAngle(float angle)
 	{
-		while ( FABS((armPot.Get()*160.0 + 20.0) - angle) > 0.5)
+		while ( fabs((armPot.Get()*160.0 + 20.0) - angle) > 0.5)
 		{    }
 	}
 
