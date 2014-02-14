@@ -34,23 +34,23 @@ public:
 	///////////////////////////////////////////////////////////////
 	void Autonomous(void)
 	{
-                compressor.Start()
+                compressor.Start();
 		myRobot.SetSafetyEnabled(false);
-                compressor.Stop()
+                compressor.Stop();
 	}
 
 	
 	///////////////////////////////////////////////////////////////
 	void OperatorControl(void)
 	{
-                compressor.Start()
+                compressor.Start();
 		myRobot.SetSafetyEnabled(true);
 		while (IsOperatorControl())
 		{
                         myRobot.TankDrive(leftStick, rightStick);
 			Wait(0.005);								// wait for a motor update time
 		}
-                compressor.Stop()
+                compressor.Stop();
 	}
 	
 	///////////////////////////////////////////////////////////////
