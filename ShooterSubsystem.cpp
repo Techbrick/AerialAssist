@@ -107,7 +107,6 @@ public:
 		return winchDigEncoder.Get(); //TODO: convert this to actual distance!
 	}
 };
-ratchetPiston.
 
 
 void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UINT32 winchPtr, UINT32 winchDigEncoderPtr, ...)
@@ -135,7 +134,7 @@ void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UINT32 wi
 		while ( (winchDigEncoder->Get()/255.0)*360.0) < 360.0*10.0 )
 		{   }
 
-		winch->Set(Relay.kOff);
+		winch->Set(Relay::kOff);
 		motorLockPiston->Set(false);
 	}
 	else
