@@ -25,8 +25,8 @@ public:
 		myRobot(),
                 leftStick(1),
                 rightStick(2),
-                compressor(PRESSURESWITCH_PIN, COMPRELAY_PIN)
-                l();
+                compressor(PRESSURESWITCH_PIN, COMPRELAY_PIN),
+                l()
 	{
 		myRobot.SetExpiration(0.1);
 	}
