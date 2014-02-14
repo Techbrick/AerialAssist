@@ -7,6 +7,7 @@ float fabs (float a)
 {
 	return (a<0 ? -a : a);	
 }
+void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UINT32 winchPtr, UINT32 winchDigEncoderPtr, ...);
 
 class Shooter {
 	Relay winch;
@@ -21,8 +22,6 @@ class Shooter {
 	Potentiometer armPot;
 
 	Task primeTask;
-
-	void primeTaskFunc();
 
 public:
 	Shooter () :
@@ -42,7 +41,7 @@ public:
 
 	void prime()
 	{
-		primeTask.Start();
+		primeTask.Start( (UINT32) &motorLockPiston, (UINT32) &ratchetPiston, (UINT32) &winch, (UINT32) &winchDigEncoder);
 	}
 
 	bool cancel()
@@ -52,24 +51,24 @@ public:
 
 	void fire()
 	{
-		if (primeTask.GetID())
-			SmartDashboard::PutString("Errors", "Shooter::fire(): Shooter::prime() still running");
+		while (primeTask.GetID())
+		{
+			;
+		}
+
+		//motorLockPiston=in, ratchetPiston=out, winch=off
+		//state: ready
+		if (!motorLockPiston.Get() && ratchetPiston.Get() && !winch.Get())
+		{
+			ratchetPiston.Set(false);	// fire.
+			Wait(0.1);
+			winchDigEncoder.Reset();
+		}
 		else
 		{
-			//motorLockPiston=in, ratchetPiston=out, winch=off
-			//state: ready
-			if (!motorLockPiston.Get() && ratchetPiston.Get() && !winch.Get())
-			{
-				ratchetPiston.Set(false);	// fire.
-				Wait(0.1);
-				winchDigEncoder.Reset();
-			}
-			else
-			{
-				//other
-				///state: probably very broken.
-				SmartDashboard::PutString("Errors", "Shooter::fire(): Unexpected state, potential danger!");
-			}
+			//other
+			///state: probably very broken.
+			SmartDashboard::PutString("Errors", "Shooter::fire(): Unexpected state, potential danger!");
 		}
 	}
 
@@ -108,35 +107,42 @@ public:
 		return winchDigEncoder.Get(); //TODO: convert this to actual distance!
 	}
 };
+ratchetPiston.
 
 
-
-void primeTaskFunc()
+void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UINT32 winchPtr, UINT32 winchDigEncoderPtr, ...)
 {
+	va_list arguments;
+	va_start(arguments, winchDigEncoderPtr);
+
+	Pneumatic *motorLockPiston = (Pneumatic *) va_arg(arguments, UINT32);
+	Pneumatic *ratchetPiston = (Pneumatic *) va_arg(arguments, UINT32);
+	Relay *winch = (Relay *) va_arg(arguments, UINT32);
+	Encoder *winchDigEncoder = (Encoder *) va_arg(arguments, UINT32);
+
 	//pn1=in, pn2=in, winch=off
 	//state: fired
-	if (!motorLockPiston.Get() && !ratchetPiston.Get() && !winch.Get())
+	if (!motorLockPiston->Get() && !ratchetPiston->Get() && !winch->Get())
 	{
-		ratchetPiston.Set(true);	// This order is important
-		motorLockPiston.Set(true);
+		ratchetPiston->Set(true);	// This order is important
+		motorLockPiston->Set(true);
 
-
-		winch.Set(Relay.kOn);
-		winchDigEncoder.Reset();
+		winch->Set(Relay.kOn);
+		winchDigEncoder->Reset();
 
 		//while the winch has spun less than 10 revs. This is temporary.
 		//TODO: replace this with something useful.
-		while ( (winchDigEncoder.Get()/255.0)*360.0) < 360.0*10.0 )
+		while ( (winchDigEncoder->Get()/255.0)*360.0) < 360.0*10.0 )
 		{   }
 
-		winch.Set(Relay.kOff);
-		motorLockPiston.Set(false);
+		winch->Set(Relay.kOff);
+		motorLockPiston->Set(false);
 	}
 	else
 	{
 		//motorLockPiston=in, ratchetPiston=out, winch=off
 		//state: ready
-		if (!motorLockPiston.Get() && ratchetPiston.Get() && !winch.Get())
+		if (!motorLockPiston->Get() && ratchetPiston->Get() && !winch->Get())
 		{
 			//Do nothing.
 		}
@@ -147,4 +153,6 @@ void primeTaskFunc()
 			SmartDashboard::PutString("Errors","Shooter::prime(): Shooter in unexpected state");
 		}
 	}
+
+	va_end(arguments);
 }
