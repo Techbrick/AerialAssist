@@ -12,27 +12,24 @@ public:
 		OutSole (OutSoleChannel)
 	{    }
 
-	void Set (bool state);	// true is out, false is in
-	bool Get ();			// the same
+	void Set (bool state)
+	{
+		if (InSole.Get())
+		{
+			InSole.Set (!state);
+			OutSole.Set (state);
+		}
+		else
+		{
+			OutSole.Set (state);
+			InSole.Set (!state);
+		}
+	}
+
+	bool Get ()
+	{
+		return OutSole.Get();
+	}
 };
-
-void Pneumatic::Set (bool state)
-{
-	if (InSole.Get())
-	{
-		InSole.Set (!state);
-		OutSole.Set (state);
-	}
-	else
-	{
-		OutSole.Set (state);
-		InSole.Set (!state);
-	}
-}
-
-bool Pneumatic::Get ()
-{
-	return OutSole.Get();
-}
 
 #endif
