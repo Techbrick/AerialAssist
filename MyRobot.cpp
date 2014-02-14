@@ -26,6 +26,7 @@ public:
                 leftStick(1),
                 rightStick(2),
                 compressor(PRESSURESWITCH_PIN, COMPRELAY_PIN)
+                l();
 	{
 		myRobot.SetExpiration(0.1);
 	}
@@ -36,6 +37,12 @@ public:
 	{
                 compressor.Start();
 		myRobot.SetSafetyEnabled(false);
+
+                int resp = l.findtargets();
+                if (resp == 0) {
+                        SmartDashboard::PutString("Data Recvd", "GOAL IS HOT");
+                }
+
                 compressor.Stop();
 	}
 
