@@ -126,7 +126,7 @@ void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UINT32 wi
 		ratchetPiston->Set(true);	// This order is important
 		motorLockPiston->Set(true);
 
-		winch->Set(Relay.kOn);
+		winch->Set(Relay::kOn);
 		winchDigEncoder->Reset();
 
 		//while the winch has spun less than 10 revs. This is temporary.
