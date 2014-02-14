@@ -21,7 +21,7 @@ public:
 		RightSuper (DRIVE_RIGHTSHIFTSOLIN, DRIVE_RIGHTSHIFTSOLOUT)
 	{    }
 
-	void TankDrive(Joystick leftStick, Joystick rightStick)
+	void TankDrive(Joystick &leftStick, Joystick &rightStick)
 	{
 		RobotDrive::TankDrive(leftStick, rightStick);
 
