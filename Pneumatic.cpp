@@ -26,7 +26,7 @@ public:
 		}
 	}
 
-	bool Pneumatic::Get ()
+	bool Get ()
 	{
 		return OutSole.Get();
 	}
