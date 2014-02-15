@@ -13,15 +13,14 @@ inline float sign (float a)
 	return (a<0 ? -1.0 : 1.0);
 }
 
-inline void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UINT32 winchPtr, UINT32 winchDigEncoderPtr, UINT32 winchLimitSwitch ...)
+inline void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UINT32 winchPtr, UINT32 winchLimitSwitchPtr, ...)
 {
 	va_list arguments;
-	va_start(arguments, winchDigEncoderPtr);
+	va_start(arguments, winchLimitSwitchPtr);
 
 	Pneumatic *motorLockPiston = (Pneumatic *) va_arg(arguments, UINT32);
 	Pneumatic *ratchetPiston = (Pneumatic *) va_arg(arguments, UINT32);
 	Relay *winch = (Relay *) va_arg(arguments, UINT32);
-	Encoder *winchDigEncoder = (Encoder *) va_arg(arguments, UINT32);
 	DigitalInput *winchLimitSwitch = (DigitalInput *) va_arg(arguments, UINT32);
 
 	//pn1=in, pn2=in, winch=off
@@ -32,11 +31,10 @@ inline void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UI
 		motorLockPiston->Set(true);
 
 		winch->Set(Relay::kOn);
-		winchDigEncoder->Reset();
 
 		//while the winch has spun less than 10 revs. This is temporary.
 		//TODO: replace this with something useful.
-		while ( (winchDigEncoder->Get()) < 360.0*10.0 && winchLimitSwitch->Get() == false )
+		while ( winchLimitSwitch->Get() == false )
 		{   }
 
 		winch->Set(Relay::kOff);
@@ -64,7 +62,6 @@ inline void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UI
 
 class Shooter {
 	Relay winch;
-	Encoder winchDigEncoder;
 	DigitalInput winchLimitSwitch;
 
 	bool winchPrimed;
@@ -82,7 +79,6 @@ class Shooter {
 public:
 	Shooter () :
 		winch (SHOOTER_WINCHSPIKE),
-		winchDigEncoder (SHOOTER_WINCHDIGITALENCA, SHOOTER_WINCHDIGITALENCB),
 		winchLimitSwitch (SHOOTER_WINCHLIMITSWITCH),
 		motorLockPiston (SHOOTER_WINCHMOTORSOLIN, SHOOTER_WINCHMOTORSOLOUT),
 		ratchetPiston (SHOOTER_WINCHRATCHSOLIN, SHOOTER_WINCHRATCHSOLOUT),
@@ -91,14 +87,11 @@ public:
 		armFrontLimitSwitch (SHOOTER_ARMLIMITSWITCHFRONT),
 		armPot (SHOOTER_ARMPOT),
 		primeTask ("Prime", (FUNCPTR) primeTaskFunc)
-	{
-		winchDigEncoder.Start();
-		winchDigEncoder.Reset();
-	}
+	{    }
 
 	void Prime()
 	{
-		primeTask.Start( (UINT32) &motorLockPiston, (UINT32) &ratchetPiston, (UINT32) &winch, (UINT32) &winchDigEncoder, (UINT32) &winchLimitSwitch);
+		primeTask.Start( (UINT32) &motorLockPiston, (UINT32) &ratchetPiston, (UINT32) &winch, (UINT32) &winchLimitSwitch);
 	}
 
 	bool Cancel()
@@ -138,7 +131,6 @@ public:
 		{
 			ratchetPiston.Set(false);	// fire.
 			Wait(0.1);
-			winchDigEncoder.Reset();
 			winchPrimed = false;
 		}
 		else
@@ -202,10 +194,5 @@ public:
 
 		arm.Set(0.0);
 		armPot.CalibrateEnd();
-	}
-
-	float GetWinchDistance()
-	{
-		return (winchDigEncoder.Get()/360.0) * 3.14; //TODO: convert this to actual distance!
 	}
 };
