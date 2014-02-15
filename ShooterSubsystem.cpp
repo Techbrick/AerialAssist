@@ -173,6 +173,18 @@ public:
 		arm.Set(0);
 	}
 
+	void MoveArm(float power)
+	{		
+		if ((armBackLimitSwitch.Get() && power<0.0) || (armFrontLimitSwitch.Get() && power>0.0))
+		{
+			arm.Set(0);
+		}
+		else
+		{
+			arm.Set(power);
+		}
+	}
+
 	void Calibrate()
 	{
 		arm.Set(0.8);	//TODO: make sure this is the right direction!
