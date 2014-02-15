@@ -16,20 +16,28 @@ class RobotDemo : public SimpleRobot
 {
 	// CANNOT INITIALIZE THE SAME JAGUAR TWICE!!!!
         DriveSubsystem myRobot;
+        Shooter shooter;
         Joystick leftStick;
         Joystick rightStick;
+        Joystick operatorStick;
         Compressor compressor;
         NetworkListener l;
 
 public:
 	RobotDemo(void):
 		myRobot(),
-                leftStick(1),
-                rightStick(2),
+                leftStick(2),
+                rightStick(1),
+                operatorStick(3),
                 compressor(PRESSURESWITCH_PIN, COMPRELAY_PIN),
                 l()
 	{
 		myRobot.SetExpiration(0.1);
+
+                myRobot.SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
+                myRobot.SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
+                myRobot.SetInvertedMotor(RobotDrive::kFrontRightMotor, true);
+                myRobot.SetInvertedMotor(RobotDrive::kRearRightMotor, true);
 	}
 
 
@@ -56,6 +64,15 @@ public:
 		while (IsOperatorControl())
 		{
                         myRobot.TankDrive(leftStick, rightStick);
+
+                        shooter.MoveArm(operatorStick.GetY());
+                        
+                        if (operatorStick.GetRawButton(6)) {
+                                //adsf
+                        } else if (operatorStick.GetRawButton(7)) {
+                                //asdf
+                        }
+
 			Wait(0.005);								// wait for a motor update time
 		}
                 compressor.Stop();
