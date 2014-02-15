@@ -5,6 +5,7 @@
 #include "DriveSubsystem.cpp"
 #include "NetworkListener.cpp"
 #include "ShooterSubsystem.cpp"
+#include "PickUpSubsystem.cpp"
 
 /**
  * MyRobot.cpp
@@ -17,6 +18,7 @@ class RobotDemo : public SimpleRobot
 	// CANNOT INITIALIZE THE SAME JAGUAR TWICE!!!!
         DriveSubsystem myRobot;
         Shooter shooter;
+        PickUpSubsystem grabber;
         Joystick leftStick;
         Joystick rightStick;
         Joystick operatorStick;
@@ -68,9 +70,15 @@ public:
                         shooter.MoveArm(operatorStick.GetY());
                         
                         if (operatorStick.GetRawButton(6)) {
-                                //adsf
+                                grabber.SetArm(true);
+                                grabber.SetRoller(-1); //TODO: check direction
+                                shooter.Relax():
                         } else if (operatorStick.GetRawButton(7)) {
-                                //asdf
+                                grabber.SetArm(false);
+                                grabber.SetRoller(1);
+                        } else {
+                                grabber.SetArm(false);
+                                grabber.SetRoller(0);
                         }
 
 			Wait(0.005);								// wait for a motor update time
