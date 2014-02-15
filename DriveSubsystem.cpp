@@ -11,14 +11,12 @@
 
 
 class DriveSubsystem : public RobotDrive {
-	Pneumatic LeftSuper;	//Left Super Shifter
-	Pneumatic RightSuper;	//Right - -
+	Pneumatic SuperShifter;	//Super Shifter Pneumatic
 	
 public:
 	DriveSubsystem ( ) :
 		RobotDrive (DRIVE_FRONTLEFT, DRIVE_REARLEFT, DRIVE_FRONTRIGHT, DRIVE_REARRIGHT),
-		LeftSuper (DRIVE_LEFTSHIFTSOLIN, DRIVE_LEFTSHIFTSOLOUT),
-		RightSuper (DRIVE_RIGHTSHIFTSOLIN, DRIVE_RIGHTSHIFTSOLOUT)
+		SuperShifter (DRIVE_SUPERSHIFTSOLIN, DRIVE_SUPERSHIFTSOLOUT)
 	{    }
 
 	void TankDrive(Joystick &leftStick, Joystick &rightStick)
@@ -27,13 +25,11 @@ public:
 
 		if (leftStick.GetRawButton(1))
 		{
-			LeftSuper.Set(true);	//Push out both shifters 
-			RightSuper.Set(true);
+			SuperShifter.Set(true);	//Push pistons out
 		}
 		else
 		{
-			LeftSuper.Set(false);	//Pull in both shifters 
-			RightSuper.Set(false);
+			SuperShifter.Set(false);	//Pull pistons in
 		}
 	}
 };
