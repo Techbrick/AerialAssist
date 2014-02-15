@@ -25,13 +25,11 @@ public:
 
 		if (leftStick.GetRawButton(1))
 		{
-			LeftSuper.Set(true);	//Push out both shifters 
-			RightSuper.Set(true);
+			SuperShifter.Set(true);	//Push pistons out
 		}
 		else
 		{
-			LeftSuper.Set(false);	//Pull in both shifters 
-			RightSuper.Set(false);
+			SuperShifter.Set(false);	//Pull pistons in
 		}
 	}
 };
