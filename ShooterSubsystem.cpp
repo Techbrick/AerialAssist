@@ -30,10 +30,9 @@ inline void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UI
 		ratchetPiston->Set(true);	// This order is important
 		motorLockPiston->Set(true);
 
-		winch->Set(Relay::kOn);
+		winch->Set(Relay::kReverse);
 
-		//while the winch has spun less than 10 revs. This is temporary.
-		//TODO: replace this with something useful.
+		//while the winch hasn't hit the limit.
 		while ( winchLimitSwitch->Get() == false )
 		{   }
 
