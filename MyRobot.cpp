@@ -28,6 +28,8 @@ class RobotDemo : public SimpleRobot
 public:
 	RobotDemo(void):
 		myRobot(),
+                shooter(),
+                grabber(),
                 leftStick(2),
                 rightStick(1),
                 operatorStick(3),
@@ -66,22 +68,43 @@ public:
 		while (IsOperatorControl())
 		{
                         myRobot.TankDrive(leftStick, rightStick);
+                        shooter.MoveArm(-operatorStick.GetY());
+                        shooter.ShowPotentiometer();
 
-                        shooter.MoveArm(operatorStick.GetY());
-                        
-                        if (operatorStick.GetRawButton(6)) {
-                                grabber.SetArm(true);
-                                grabber.SetRoller(-1); //TODO: check direction
-                                shooter.Relax():
-                        } else if (operatorStick.GetRawButton(7)) {
-                                grabber.SetArm(false);
-                                grabber.SetRoller(1);
-                        } else {
-                                grabber.SetArm(false);
-                                grabber.SetRoller(0);
+                        // testing controls for the ratchet
+                        if (operatorStick.GetRawButton(11) && operatorStick.GetRawButton(10)) {
+                            shooter.SetRatchet(true);
+                        } else if (operatorStick.GetRawButton(11)) {
+                            shooter.SetRatchet(false);
                         }
 
+                        // shooting controls
+                        if (operatorStick.GetRawButton(8)) {
+                            shooter.Prime();
+                        } else if (oepratorStick.GetRawButton(1)) {
+                            shooter.Fire();
+                        } else if (operatorStick.GetRawButton(11)) {
+                            shooter.Cancel(); // doesn't actually work for some reason
+                        }
+
+                        // grabber arm controls
+                        if (operatorStick.GetRawButton(4)) {
+                            grabber.SetArm(true);
+                        } else if (operatorStick.GetRawButton(5)) {
+                            grabber.SetArm(false);
+                        }
+
+                        // grabber roller controls
+                        if (operatorStick.GetRawButton(2)) {
+                            grabber.SetRoller(-1);
+                        } else if (operatorStick.GetRawButton(3)) {
+                            grabber.SetRoller(1);
+                        } else {
+                            grabber.SetRoller(0);
+                        }
+                        
 			Wait(0.005);								// wait for a motor update time
+
 		}
                 compressor.Stop();
 	}
