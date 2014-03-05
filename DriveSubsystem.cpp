@@ -9,7 +9,6 @@
 //TODO: Possibly a Talon current check to prevent burnouts.
 
 
-
 class DriveSubsystem : public RobotDrive {
 	Pneumatic SuperShifter;	//Super Shifter Pneumatic
 	
@@ -23,14 +22,19 @@ public:
 	{
 		RobotDrive::TankDrive(leftStick, rightStick);
 
-		if (leftStick.GetRawButton(1))
+		if (leftStick.GetRawButton(1) && SuperShifter.Get() == false)
 		{
 			SuperShifter.Set(true);	//Push pistons out
 		}
-		else
+		else if (leftStick.GetRawButton(1) == false && SuperShifter.Get())
 		{
 			SuperShifter.Set(false);	//Pull pistons in
 		}
+	}
+
+	void TankDrive(float leftValue, float rightValue)
+	{
+		RobotDrive::TankDrive(leftValue, rightValue);
 	}
 };
 
