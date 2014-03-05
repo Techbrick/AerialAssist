@@ -13,12 +13,13 @@ inline float sign (float a)
 	return (a<0 ? -1.0 : 1.0);
 }
 
-inline void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UINT32 winchPtr, UINT32 winchLimitSwitchPtr, ...)
+inline void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UINT32 winchPtr, UINT32 winchLimitSwitchPtr, UINT32 joystickCancelPtr, UINT32 joystickButtonInt, ...)
 {
 	Pneumatic *motorLockPiston = (Pneumatic *) motorLockPistonPtr;
 	Pneumatic *ratchetPiston = (Pneumatic *) ratchetPistonPtr;
 	Relay *winch = (Relay *) winchPtr;
 	DigitalInput *winchLimitSwitch = (DigitalInput *) winchLimitSwitchPtr;
+	Joystick *joystickCancel = (Joystick *) joystickCancelPtr;
 
 
 	ratchetPiston->Set(true);	// This order is important
@@ -27,8 +28,10 @@ inline void primeTaskFunc(UINT32 motorLockPistonPtr, UINT32 ratchetPistonPtr, UI
 	winch->Set(Relay::kReverse);
 
 	//while the winch hasn't hit the limit.
-	while ( winchLimitSwitch->Get() == false )
-	{   }
+	while ( winchLimitSwitch->Get() == false && !joystickCancel->GetRawButton(joystickButtonInt))
+	{
+
+	}
 
 	winch->Set(Relay::kOff);
 	motorLockPiston->Set(false);
@@ -62,9 +65,9 @@ public:
 		primeTask ("Prime", (FUNCPTR) primeTaskFunc)
 	{    }
 
-	void Prime()
+	void Prime(Joystick *joystickCancel, UINT32 joystickCancelButton)
 	{
-		primeTask.Start( (UINT32) &motorLockPiston, (UINT32) &ratchetPiston, (UINT32) &winch, (UINT32) &winchLimitSwitch);
+		primeTask.Start((UINT32) &motorLockPiston, (UINT32) &ratchetPiston, (UINT32) &winch, (UINT32) &winchLimitSwitch, (UINT32) &joystickCancel, joystickCancelButton);
 	}
 
 	bool Cancel()
