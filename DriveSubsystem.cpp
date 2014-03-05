@@ -31,4 +31,9 @@ public:
 			SuperShifter.Set(false);	//Pull pistons in
 		}
 	}
+
+	void TankDrive(float leftValue, float rightValue)
+	{
+		RobotDrive::TankDrive(leftValue, rightValue);
+	}
 };
