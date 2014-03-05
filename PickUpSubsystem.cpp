@@ -23,7 +23,7 @@ public:
 	{
 		if (direction == -1)
 		{
-			rollerSpike.Set(Relay::kBackwards);
+			rollerSpike.Set(Relay::kReverse);
 		}
 		
 		if (direction == 0)
@@ -33,7 +33,7 @@ public:
 		
 		if (direction == 1)
 		{
-			rollerSpike.Set(Relay::kOn);
+			rollerSpike.Set(Relay::kForward);
 		}
 	}
 };
