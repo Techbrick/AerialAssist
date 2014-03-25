@@ -58,7 +58,7 @@ public:
 
             if (lpswitch.Get() != 0) { // if it hit the left switch first
                 while (rpswitch.Get() == 0) {
-                    myRobot.TankDrive(0, .3);
+                    myRobot.TankDrive(0, .3);   
                 }
             } else if (rpswitch.Get() != 0) { // if it hit the right switch first
                 while (lpswitch.Get() == 0) {
