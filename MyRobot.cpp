@@ -3,9 +3,11 @@
 #include "PinDefinitions.h"
 #include "Pneumatic.cpp"
 #include "DriveSubsystem.cpp"
-#include "NetworkListener.cpp"
+//#include "NetworkListener.cpp"
 #include "ShooterSubsystem.cpp"
 #include "PickUpSubsystem.cpp"
+#include "Vision.cpp"
+#include "pthread.h"
 
 /**
  * MyRobot.cpp
@@ -16,7 +18,7 @@
 class RobotDemo : public SimpleRobot
 {
 	// CANNOT INITIALIZE THE SAME JAGUAR TWICE!!!!
-        DriveSubsystem myRobot;
+        DriveSubsystem myRobot; 
         Shooter shooter;
         PickUpSubsystem grabber;
         Joystick leftStick;
@@ -25,7 +27,10 @@ class RobotDemo : public SimpleRobot
         Compressor compressor;
         DigitalInput lpswitch;
         DigitalInput rpswitch;
-        NetworkListener l;
+        AnalogChannel pot;
+        Encoder leftEncoder;
+        Vision vision;
+        //NetworkListener l;
 
 public:
 	RobotDemo(void):
@@ -38,7 +43,10 @@ public:
                 compressor(PRESSURESWITCH_PIN, COMPRELAY_PIN),
                 lpswitch(DRIVE_LEFTPSWITCH),
                 rpswitch(DRIVE_RIGHTPSWITCH),
-                l()
+                pot(7),
+                leftEncoder(11, 12, true),
+                vision()
+                //l()
 	{
 		myRobot.SetExpiration(0.1);
 
@@ -73,13 +81,58 @@ public:
 	void Autonomous(void)
 	{
                 compressor.Start();
+                leftEncoder.Start();
+                leftEncoder.Reset();
 		myRobot.SetSafetyEnabled(false);
-
-                int resp = l.findtargets();
+		double angle = 55;
+		Wait(.25);
+				if((pot.GetValue()-608.5)/(-3.566666667)>=angle)
+				{
+					while((pot.GetValue()-608.5)/(-3.566666667)>=angle)
+					{
+						shooter.MoveArm(1);
+					}
+				}
+				else
+				{
+					while((pot.GetValue()-608.5)/(-3.566666667)<=angle)
+					{
+						shooter.MoveArm(-1);
+					}
+				}
+				
+				shooter.MoveArm(0);
+				
+				
+				Wait(.5);
+				
+				
+				while(leftEncoder.Get()/250*3.14*6/12 < 8){
+					myRobot.TankDrive(-1, -.9);
+				}
+				
+				vision.Process();
+				
+				while(leftEncoder.Get()/250*3.14*6/12 < 12){
+					myRobot.TankDrive(-.55, -.5);
+				}
+				//Wait(3.2);
+				
+				myRobot.TankDrive(0, 0);
+				
+				Wait(.5);
+				
+				if(!vision.GoalIsHot())
+				{
+					Wait(3);
+				}
+				
+				shooter.Fire();
+				/*int resp = l.findtargets();
                 if (resp == 0) {
                         SmartDashboard::PutString("Data Recvd", "GOAL IS HOT");
                 }
-
+                */
                 compressor.Stop();
 	}
 
@@ -87,13 +140,20 @@ public:
 	///////////////////////////////////////////////////////////////
 	void OperatorControl(void)
 	{
-                compressor.Start();
+        compressor.Start();
+        leftEncoder.Start();
+        leftEncoder.Reset();
 		myRobot.SetSafetyEnabled(true);
 		while (IsOperatorControl())
 		{
-                        myRobot.TankDrive(leftStick, rightStick);
+						SmartDashboard::PutNumber("Potentiometer", (int) (pot.GetValue()-608.5)/(-3.566666667));
+						SmartDashboard::PutNumber("Encoder", leftEncoder.Get()/250*3.14*6/12);
+						//printf("loop \n");
+						myRobot.TankDrive(leftStick, rightStick);
                         shooter.MoveArm(-operatorStick.GetY());
-                        shooter.ShowPotentiometer();
+                        
+                        
+                        //shooter.ShowPotentiometer();
 
                         // testing controls for the ratchet
                         if (operatorStick.GetRawButton(11) && operatorStick.GetRawButton(10)) {
@@ -103,13 +163,15 @@ public:
                         }
 
                         // shooting controls
+                        //printf("shooter buttons \n");
                         if (operatorStick.GetRawButton(8)) {
+                        	printf("GO! \n");
                             shooter.Prime(&operatorStick, SHOOTER_CANCELBUTTON);
                         } else if (operatorStick.GetRawButton(1)) {
                             shooter.Fire();
-                        } else if (operatorStick.GetRawButton(11)) {
+                        } /*else if (operatorStick.GetRawButton(11)) {
                             shooter.Cancel(); // doesn't actually work for some reason
-                        }
+                        }*/
 
                         // grabber arm controls
                         if (operatorStick.GetRawButton(4)) {
@@ -118,7 +180,7 @@ public:
                             grabber.SetArm(false);
                         }
 
-                        // grabber roller controls
+                        // grabber roller controls 
                         if (operatorStick.GetRawButton(2)) {
                             grabber.SetRoller(-1);
                         } else if (operatorStick.GetRawButton(3)) {
@@ -134,8 +196,36 @@ public:
 	}
 	
 	///////////////////////////////////////////////////////////////
-	void Test() {
+	void Test() {	
+	
+		double angle = 55;
+		compressor.Start();
+		while(!compressor.GetPressureSwitchValue())
+		{
+		                        	
+		}
+		                        
+		                compressor.Stop();
+						if((pot.GetValue()-608.5)/(-3.566666667)>=angle)
+						{
+							while((pot.GetValue()-608.5)/(-3.566666667)>=angle)
+							{
+								shooter.MoveArm(1);
+							}
+						}
+						else
+						{
+							while((pot.GetValue()-608.5)/(-3.566666667)<=angle)
+							{
+								shooter.MoveArm(-1);
+							}
+						}
+						
+						shooter.MoveArm(0);
+						
 
+                        shooter.Prime(&operatorStick, SHOOTER_CANCELBUTTON);
+                        grabber.SetArm(true);                                      
 	}
 };
 
