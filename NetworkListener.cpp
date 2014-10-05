@@ -9,11 +9,11 @@ public:
 
         int findtargets() {
                 struct sockaddr_in serverAddr;
-                struct sockaddr_in clientAddr;
+                //struct sockaddr_in clientAddr;
 
                 int sockAddrSize;
                 int sockFd;
-                Timer t = new Timer();
+                //Timer t = new Timer();
 
                 SmartDashboard::PutString("Data Recvd", "initializing");
                 sockAddrSize = sizeof(struct sockaddr_in);
@@ -34,18 +34,18 @@ public:
                 }
 
                 SmartDashboard::PutString("Data Recvd", "waiting...");
-                int bytesRecvd = 0;
-                char buf[256];
-                t.start();
-                while (buf[0] != '2' || !t.HasPeriodPassed(5.0)) {
+                //int bytesRecvd = 0;
+                //char buf[256];
+                //t.start();
+                /*while (buf[0] != '2' || !t.HasPeriodPassed(5.0)) {
                         memset(buf, 0, sizeof(buf));
                         if ((bytesRecvd = recvfrom(sockFd, buf, 255, 0, (struct sockaddr *) &clientAddr, &sockAddrSize)) == ERROR) {
                                 SmartDashboard::PutString("Data Recvd", "recv error");
                                 return(1);
                         }
-                }
+                }*/
 
-                t.stop()
+                //t.stop()
 
                 return(0);
 
