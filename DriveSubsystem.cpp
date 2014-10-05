@@ -18,7 +18,7 @@ public:
 		SuperShifter (DRIVE_SUPERSHIFTSOLIN, DRIVE_SUPERSHIFTSOLOUT)
 	{    }
 
-	void TankDrive(Joystick &leftStick, Joystick &rightStick)
+	void TankDrive(Joystick &rightStick, Joystick &leftStick)
 	{
 		RobotDrive::TankDrive(leftStick, rightStick);
 
