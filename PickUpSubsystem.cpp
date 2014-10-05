@@ -11,7 +11,7 @@ class PickUpSubsystem {
 public:
 	PickUpSubsystem (void) :
 		rollerSpike(PICKUP_ROLLERSPIKE),
-		pickupArm(PICKUP_PICKUPARMSOLIN, PICKUPARMSOLOUT)		
+		pickupArm(PICKUP_PICKUPARMSOLIN, PICKUP_PICKUPARMSOLOUT)		
 	{	}
 	
 	void SetArm(bool setting)
